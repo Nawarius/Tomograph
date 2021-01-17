@@ -1,1 +1,1 @@
-["Left","Left","Right","Nothing","Right","Nothing"]
+["Left","Left","Right","Right","Nothing","Nothing"][660.2249999996275,712.9549999987648,834.5150000001013,420.2199999995355,0,0]

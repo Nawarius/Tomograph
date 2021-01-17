@@ -11,16 +11,20 @@ app.use(cors())
 app.use(express.json())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }));
-
+//app.use(express.static(__dirname))
 
 
 app.post('/setData', (req,res)=>{
   const convertedMoves = MovesConverter(req.body.moves)
   fs.writeFileSync('Moves.txt', JSON.stringify(convertedMoves))
-  fs.writeFileSync('Times.txt', JSON.stringify(req.body.times))
+  fs.appendFileSync('Moves.txt', JSON.stringify(req.body.times))
+
+  const movesAndTimes = fs.readFileSync('Moves.txt', 'utf-8')
+
+  res.send({ movesAndTimes })
 })
 
-app.get('/', (req, res)=>{
+app.get('/getData', (req, res)=>{
   const position = fs.readFileSync('trial_position_sequence.txt', 'utf-8')
   const delay = fs.readFileSync('trial_delay_sequence.txt', 'utf-8')
   const tricks = fs.readFileSync('trial_tricks_sequence.txt', 'utf-8')
