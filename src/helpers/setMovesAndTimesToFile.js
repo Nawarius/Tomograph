@@ -1,9 +1,11 @@
 import download from 'downloadjs'
+import * as Papa from 'papaparse'
 
 const setMovesAndTimesToFile = (moves, times)=>{
     const convertedMoves = MovesConverter(moves)
-    const movesAndTimes = convertedMoves.concat(times)
-    download(movesAndTimes, 'MovesAndTimes.txt', 'text/plain')
+    
+    const csv = Papa.unparse([convertedMoves, times])
+    download(csv, 'MovesAndTimes.csv', 'text/plain')
 }
 function MovesConverter(arr){
     const newArr = []

@@ -29,7 +29,7 @@ const onSceneReady = async (scene, engine) => {
         camera.setTarget(Vector3.Zero())
 
         let light = new HemisphericLight("light", new Vector3(0, 1, 0), scene)
-        light.intensity = 5
+        light.intensity = 0.5
         
         apple = await loadMesh('', 'Apple.babylon', 0, 0, 0)
         fruits.apple = apple
@@ -152,28 +152,27 @@ const onRender = (scene) => {
     if (trial_status == 'trial_end') {
         if (trial_tricks_sequence[n_trial]) {
             if (basket_position == 0) {
-                textblock.text = `good ${reactionTime}`
+                textblock.text = `good`
                 console.log('good')
             } else {
-                textblock.text = `bad ${reactionTime}`
+                textblock.text = `bad`
                 console.log('bad')
             }
         } else {
             if (basket_position == trial_position_sequence[n_trial]) {
-                textblock.text = `good ${reactionTime}`
+                textblock.text = `good`
                 console.log('good')
             } else {
-                textblock.text = `bad ${reactionTime}`
+                textblock.text = `bad`
                 console.log('bad')
             }
         }
         movesPush.push(basket.position.x)
-        timesPush.push(reactionTime)
+        timesPush.push(reactionTime.toFixed(3))
         trial_status = 'reset'
         
     }
     if (trial_status == 'reset') {
-        console.log('Here')
         basket.position.x = 0
         basket_position = 0
 
