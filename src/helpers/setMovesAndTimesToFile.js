@@ -10,8 +10,8 @@ const setMovesAndTimesToFile = (moves, times)=>{
 function MovesConverter(arr){
     const newArr = []
     arr.forEach(item=>{
-      if(item === 2) newArr.push('Left')
-      else if(item === -2) newArr.push('Right')
+      if(item > 0) newArr.push('Left')
+      else if(item < 0) newArr.push('Right')
       else newArr.push('Nothing')
     })
     return newArr

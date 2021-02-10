@@ -1,20 +1,35 @@
 import SceneContainer from './Components/SceneContainer'
+import OldVersionContainer from './Components/OldVersionContainer'
 import { useRef, useState } from 'react';
-import { Grid, Button, Typography } from '@material-ui/core';
+import { Grid, Button, Typography, withStyles, Switch } from '@material-ui/core';
 import * as Papa from 'papaparse'
+
+const BlueSwitch = withStyles({
+  switchBase: {
+    color: '#90caf9',
+    '&$checked': {
+      color: '#90caf9',
+    },
+    '&$checked + $track': {
+      backgroundColor: '#90caf9',
+    },
+  },
+  checked: {},
+  track: {},
+})(Switch)
 
 function App() {
   const [trial_position_sequence, setTrial_position_sequence] = useState([])
   const [trial_tricks_sequence, setTrial_tricks_sequence] = useState([])
   const [trial_delay_sequence, setTrial_delay_sequence] = useState([])
 
-  // const [allowedPosition, setAllowedPosition] = useState(false)
-  // const [allowedDelay, setAllowedDelay] = useState(false)
-  // const [allowedTricks, setAllowedTricks] = useState(false)
+  const [versionTrigger, setVersionTrigger] = useState(true)
 
-  const [access, setAccess] = useState(false)
+  const [accessToNewVersion, setAccessToNewVersion] = useState(false)
+  const [accessToOldVersion, setAccessToOldVersion] = useState(false)
 
   const csvRef = useRef()
+  const handleVersionTriggerChange = () => setVersionTrigger(!versionTrigger)
 
   const changeHandle = (e) => {
     switch(e.target.name){
@@ -32,7 +47,7 @@ function App() {
             setTrial_position_sequence(positions)
             setTrial_delay_sequence(delays)
             setTrial_tricks_sequence(tricks)
-            setAccess(true)
+            versionTrigger ? setAccessToNewVersion(true) : setAccessToOldVersion(true)
           }
         })
         break
@@ -41,10 +56,13 @@ function App() {
         break
     }
   }
-
+  
   return <>
-  {!access &&
-  <Grid container direction = 'column' justify = 'center' alignItems = 'center' style = {{height:'100%'}} spacing = {3}>
+  {!accessToNewVersion && !accessToOldVersion &&
+  <Grid container direction = 'column' justify = 'center' alignItems = 'center' style = {{height:'100%', color: 'white'}} spacing = {3}>
+      <BlueSwitch checked={versionTrigger} onChange={handleVersionTriggerChange} />
+      {versionTrigger && <p>New Version</p>}
+      {!versionTrigger && <p>Old Version</p>}
         <Grid item>
             <Button component = 'label' variant = 'contained' style = {{color:'#333333',backgroundColor:'#90caf9'}}>
                 <input type = "file" ref = {csvRef} name = 'csv' hidden onChange = {changeHandle} />
@@ -53,13 +71,21 @@ function App() {
         </Grid>
   </Grid>
   }
-  {access && 
+  {accessToNewVersion && 
   <SceneContainer trial_position_sequence = {trial_position_sequence}
-    trial_tricks_sequence = {trial_tricks_sequence} trial_delay_sequence = {trial_delay_sequence}
+      trial_tricks_sequence = {trial_tricks_sequence} trial_delay_sequence = {trial_delay_sequence}
     />
-    }
-    
-  </>
+  }
+  {accessToOldVersion && 
+  <OldVersionContainer trial_position_sequence = {trial_position_sequence}
+      trial_tricks_sequence = {trial_tricks_sequence} trial_delay_sequence = {trial_delay_sequence}
+    />
+  }
+  </>   
 }
 
 export default App
+
+
+
+
