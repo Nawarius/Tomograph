@@ -36,13 +36,14 @@ function App() {
       case 'csv':{
         Papa.parse(csvRef.current.files[0], {
           dynamicTyping:true,
+          skipEmptyLines: true,
           header:true,
           complete: function(res){
             const positions = [], delays = [], tricks = []
             res.data.forEach(item=>{
-              positions.push(item.positions)
-              delays.push(item.delay)
-              tricks.push(item.tricks)
+                positions.push(item.positions)
+                delays.push(item.delay)
+                tricks.push(item.tricks)
             })
             setTrial_position_sequence(positions)
             setTrial_delay_sequence(delays)

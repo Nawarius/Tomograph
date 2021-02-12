@@ -12,10 +12,11 @@ let in_trial_time = 0
 let trial_status = "stop"
 
 let ground = null, leftArrowMaterial = null, rightArrowMaterial = null, topArrowMaterial = null
-let movesPush = [], timesPush = []
+let movesAndTimes = []
 let initialTricksArray = []
 
 const MainComponent = ({trial_position_sequence, trial_delay_sequence, trial_tricks_sequence}) => {
+    
 initialTricksArray = [...trial_tricks_sequence]
 
 const onSceneReady = (scene, engine) => {
@@ -129,8 +130,7 @@ if (trial_status == 'trial_end') {
             console.log('bad')
         }
     }
-    movesPush.push(basket_position)
-    timesPush.push(reactionTime.toFixed(3))
+    movesAndTimes.push({ position: basket_position, reaction: reactionTime.toFixed(3) })
     trial_status = 'reset'
     
 }
@@ -143,9 +143,8 @@ if (trial_status == 'reset') {
     n_trial += 1
     if (n_trial >= trial_delay_sequence.length) {
         trial_status = 'stop'
-        setMovesAndTimesToFile(movesPush, timesPush)
-        movesPush = []
-        timesPush = []
+        setMovesAndTimesToFile(movesAndTimes)
+        movesAndTimes = []
         trick_delay = 50
         trial_tricks_sequence = [...initialTricksArray]
     }

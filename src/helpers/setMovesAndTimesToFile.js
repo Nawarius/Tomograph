@@ -1,18 +1,25 @@
 import download from 'downloadjs'
 import * as Papa from 'papaparse'
 
-const setMovesAndTimesToFile = (moves, times)=>{
-    const convertedMoves = MovesConverter(moves)
+const setMovesAndTimesToFile = (movesAndTimes)=>{
+    const convertedMovesAndTimes = MovesConverter(movesAndTimes)
     
-    const csv = Papa.unparse([convertedMoves, times])
+  console.log(convertedMovesAndTimes)
+    const csv = Papa.unparse(convertedMovesAndTimes, {
+      quotes: false, 
+      delimiter: ",",
+      header: true,
+      newline: "\r\n",                        
+      columns: [ "position", "reaction"]
+    }) 
     download(csv, 'MovesAndTimes.csv', 'text/plain')
 }
 function MovesConverter(arr){
     const newArr = []
     arr.forEach(item=>{
-      if(item > 0) newArr.push('Left')
-      else if(item < 0) newArr.push('Right')
-      else newArr.push('Nothing')
+      if(item.position > 0) newArr.push({position: 'Left', reaction: item.reaction})
+      else if(item.position < 0) newArr.push({position: 'Right', reaction: item.reaction})
+      else newArr.push({position: 'Nothing', reaction: item.reaction})
     })
     return newArr
   }
