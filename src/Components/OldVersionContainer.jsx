@@ -1,7 +1,9 @@
 import React from 'react'
-import { Vector3, HemisphericLight, MeshBuilder, StandardMaterial, Texture, ArcRotateCamera, Tools } from '@babylonjs/core'
+import { Vector3, HemisphericLight, ArcRotateCamera, Tools, Color3 } from '@babylonjs/core'
 import SceneComponent from './OldVersionPresent'
 import setMovesAndTimesToFile from '../helpers/setMovesAndTimesToFile'
+import { AdvancedDynamicTexture, Image } from '@babylonjs/gui/2D'
+
 
 let trick_delay = 50
 let reactionTime = 0, prematureReaction = 0
@@ -11,7 +13,8 @@ let in_trial_time = 0
 
 let trial_status = "stop"
 
-let ground = null, leftArrowMaterial = null, rightArrowMaterial = null, topArrowMaterial = null
+let advancedTexture = null, instructionImage = null, rightArrowImage = null, leftArrowImage = null, topArrowImage = null
+let currentControl = null
 let movesAndTimes = []
 let initialTricksArray = []
 
@@ -21,24 +24,20 @@ initialTricksArray = [...trial_tricks_sequence]
 
 const onSceneReady = (scene, engine) => {
   engine.displayLoadingUI()
+  scene.clearColor = Color3.Gray()
   let camera = new ArcRotateCamera("camera", Tools.ToRadians(90), Tools.ToRadians(30), 10, Vector3.Zero(), scene)
   camera.setTarget(Vector3.Zero())
 
   var light = new HemisphericLight("light", new Vector3(0, 1, 0), scene)
-  light.intensity = 0.7
+  light.intensity = 0.5
 
-  ground = MeshBuilder.CreateGround("ground", {width: 1, height: 1}, scene)
-  ground.rotation = new Vector3(0,Math.PI,0)
-  ground.setEnabled(false)
-
-  leftArrowMaterial = new StandardMaterial("leftArrow", scene)
-  leftArrowMaterial.diffuseTexture = new Texture("./textures/leftArrow.jpg", scene)
-
-  rightArrowMaterial = new StandardMaterial("rightArrow", scene)
-  rightArrowMaterial.diffuseTexture = new Texture("./textures/rightArrow.jpg", scene)
-  
-  topArrowMaterial = new StandardMaterial("topArrow", scene)
-  topArrowMaterial.diffuseTexture = new Texture("./textures/topArrow.jpg", scene)
+  advancedTexture = new AdvancedDynamicTexture.CreateFullscreenUI("UI")
+  instructionImage = new Image("img", "./textures/Instructions_Practice.bmp")
+  rightArrowImage = new Image("img1", "./textures/Right_Arrow.BMP")
+  leftArrowImage = new Image("img2", "./textures/Left_Arrow.BMP")
+  topArrowImage = new Image("img3", "./textures/Stop_Arrow.BMP")
+  currentControl = instructionImage
+  advancedTexture.addControl(currentControl)
 
   window.addEventListener("keydown", evt => {
     if (trial_status == "in_trial_listening") {
@@ -52,7 +51,7 @@ const onSceneReady = (scene, engine) => {
               trial_tricks_sequence[n_trial] = 0
               trial_tricks_sequence[n_trial + 1] = 1
             } 
-            ground.setEnabled(false)
+            advancedTexture.removeControl(currentControl)
         } else if ((evt.keyCode == 68) | (evt.keyCode == 39)) {
             basket_position = -1
             trial_status = "in_trial_received"
@@ -63,7 +62,7 @@ const onSceneReady = (scene, engine) => {
               trial_tricks_sequence[n_trial] = 0
               trial_tricks_sequence[n_trial + 1] = 1
             } 
-            ground.setEnabled(false)
+            advancedTexture.removeControl(currentControl)
         } else {
             return
         }
@@ -75,6 +74,7 @@ const onSceneReady = (scene, engine) => {
         in_trial_time = 0
         basket_position = 0
         reactionTime = 0
+        advancedTexture.removeControl(currentControl)
     }
 }
 )
@@ -97,19 +97,20 @@ const onRender = scene => {
         if (in_trial_time > trial_delay_sequence[n_trial]) {
             trial_status = 'in_trial_listening'
               if(trial_position_sequence[n_trial] > 0) {
-                  ground.setEnabled(true)
-                  ground.material = leftArrowMaterial
+                  currentControl = leftArrowImage
+                  advancedTexture.addControl(currentControl)
               } else {
-                  ground.setEnabled(true)
-                  ground.material = rightArrowMaterial
+                  currentControl = rightArrowImage
+                  advancedTexture.addControl(currentControl)
               }
         }
     }
 
     if (trial_tricks_sequence[n_trial]) {
         if (in_trial_time > trick_delay + trial_delay_sequence[n_trial]) {
-            ground.setEnabled(true)
-            ground.material = topArrowMaterial
+            advancedTexture.removeControl(currentControl)
+            currentControl = topArrowImage
+            advancedTexture.addControl(currentControl)
         }
     }
 }
@@ -130,13 +131,15 @@ if (trial_status == 'trial_end') {
             console.log('bad')
         }
     }
+    
     movesAndTimes.push({ position: basket_position, reaction: reactionTime.toFixed(3) })
     trial_status = 'reset'
     
 }
 if (trial_status == 'reset') {
     basket_position = 0
-    ground.setEnabled(false)
+    advancedTexture.removeControl(currentControl)
+    //ground.setEnabled(false)
     reactionTime = 0
     in_trial_time = 0
     trial_status = 'in_trial_not_listening'
